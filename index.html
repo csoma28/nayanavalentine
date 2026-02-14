@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Poppins:wght@300;400;500&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #1c0c14;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ========== AMBIENT BG ========== */
+        .bg-gradient {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(255, 60, 110, 0.18) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 30%, rgba(255, 120, 170, 0.14) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 80%, rgba(255, 80, 130, 0.15) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(255, 100, 150, 0.06) 0%, transparent 80%);
+            animation: bgBreath 8s ease-in-out infinite alternate;
+            z-index: 0;
+        }
+
+        @keyframes bgBreath {
+            0% { opacity: 0.7; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* ========== SOFT LIGHT ORBS ========== */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            filter: blur(1px);
+        }
+
+        /* ========== FLOATING ELEMENTS ========== */
+        .hearts-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .floating-heart {
+            position: absolute;
+            bottom: -40px;
+            opacity: 0;
+            animation: floatUp linear infinite;
+            user-select: none;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+            8% { opacity: 0.6; }
+            50% { transform: translateY(-55vh) translateX(20px) rotate(180deg); }
+            85% { opacity: 0.3; }
+            100% { transform: translateY(-115vh) translateX(-15px) rotate(360deg); opacity: 0; }
+        }
+
+        /* ========== LANDING ========== */
+        #landing {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .landing-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: gentleFadeIn 1.5s 0.2s ease forwards;
+        }
+
+        .landing-icon svg {
+            width: 100%;
+            height: 100%;
+            fill: rgba(255, 80, 120, 0.25);
+            stroke: rgba(255, 130, 170, 0.9);
+            stroke-width: 1.2;
+            filter: drop-shadow(0 0 30px rgba(255, 80, 130, 0.6));
+            animation: heartPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes heartPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .landing-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: clamp(3rem, 9vw, 6rem);
+            color: rgba(255, 190, 210, 1);
+            margin-bottom: 12px;
+            line-height: 1.15;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: titleIn 1.8s 0.5s ease forwards;
+        }
+
+        @keyframes titleIn {
+            from { opacity: 0; transform: translateY(25px); letter-spacing: 8px; }
+            to { opacity: 1; transform: translateY(0); letter-spacing: 2px; }
+        }
+
+        .landing-subtitle {
+            font-size: clamp(0.9rem, 2.5vw, 1.05rem);
+            color: rgba(255, 170, 195, 0.7);
+            font-weight: 300;
+            max-width: 380px;
+            line-height: 2;
+            margin-bottom: 50px;
+            letter-spacing: 1px;
+            opacity: 0;
+            animation: gentleFadeIn 1.2s 1.3s ease forwards;
+        }
+
+        @keyframes gentleFadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .open-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 140, 170, 0.5);
+            color: rgba(255, 190, 210, 0.95);
+            padding: 16px 50px;
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            opacity: 0;
+            animation: gentleFadeIn 1s 1.8s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .open-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 140, 170, 0.08), transparent);
+            animation: btnShimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes btnShimmer {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+
+        .open-btn:hover {
+            background: rgba(255, 140, 170, 0.08);
+            border-color: rgba(255, 140, 170, 0.5);
+            box-shadow: 0 0 40px rgba(255, 100, 140, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ========== QUESTION ========== */
+        #question {
+            min-height: 100vh;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        #question.visible { display: flex; }
+
+        .question-photo {
+            width: clamp(250px, 50vw, 340px);
+            height: clamp(250px, 50vw, 340px);
+            border-radius: 20px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 140, 170, 0.35);
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, 0.35),
+                0 0 60px rgba(255, 80, 130, 0.2),
+                0 0 120px rgba(255, 100, 140, 0.08);
+            margin-bottom: 35px;
+            opacity: 0;
+            animation: photoIn 1.2s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes photoIn {
+            from { opacity: 0; transform: scale(0.85); filter: blur(10px) brightness(0.5); }
+            to { opacity: 1; transform: scale(1); filter: blur(0) brightness(1); }
+        }
+
+        .question-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-style: italic;
+            font-size: clamp(1.8rem, 6vw, 3.2rem);
+            color: rgba(255, 190, 215, 1);
+            margin-bottom: 45px;
+            letter-spacing: 1px;
+            opacity: 0;
+            animation: gentleFadeIn 1s 0.8s ease forwards;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            min-height: 70px;
+            opacity: 0;
+            animation: gentleFadeIn 0.8s 1.2s ease forwards;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, rgba(255, 60, 100, 0.85), rgba(255, 110, 145, 0.85));
+            border: none;
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.15rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 30px rgba(255, 60, 100, 0.35), 0 0 60px rgba(255, 80, 120, 0.12);
+            z-index: 10;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.08);
+            box-shadow: 0 12px 45px rgba(255, 60, 100, 0.45), 0 0 60px rgba(255, 100, 140, 0.15);
+        }
+
+        .btn-no {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 18px 50px;
+            font-size: 1.15rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 9999;
+            user-select: none;
+        }
+
+        /* ========== CELEBRATION ========== */
+        #celebration {
+            min-height: 100vh;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        #celebration.visible { display: flex; }
+
+        .celebration-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 300;
+            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            color: rgba(255, 195, 215, 1);
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: celebIn 1.5s 0.3s ease forwards;
+        }
+
+        @keyframes celebIn {
+            from { opacity: 0; transform: translateY(20px); letter-spacing: 6px; }
+            to { opacity: 1; transform: translateY(0); letter-spacing: 2px; }
+        }
+
+        .celebration-subtitle {
+            font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+            color: rgba(255, 175, 200, 0.75);
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            opacity: 0;
+            animation: gentleFadeIn 1s 0.9s ease forwards;
+        }
+
+        .celebration-photos {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .celebration-photo {
+            width: clamp(200px, 38vw, 300px);
+            height: clamp(260px, 48vw, 380px);
+            border-radius: 20px;
+            object-fit: cover;
+            border: 1px solid rgba(255, 140, 170, 0.35);
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.3),
+                0 0 50px rgba(255, 80, 130, 0.15),
+                0 0 100px rgba(255, 100, 140, 0.06);
+            opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.6s ease;
+        }
+
+        .celebration-photo.animate-in:nth-child(1) {
+            animation: photo1In 1.2s 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        .celebration-photo.animate-in:nth-child(2) {
+            animation: photo2In 1.2s 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+
+        @keyframes photo1In {
+            from { opacity: 0; transform: translateX(-30px) rotate(-4deg); filter: blur(8px) brightness(0.5); }
+            to { opacity: 1; transform: translateX(0) rotate(-2deg); filter: blur(0) brightness(1); }
+        }
+
+        @keyframes photo2In {
+            from { opacity: 0; transform: translateX(30px) rotate(4deg); filter: blur(8px) brightness(0.5); }
+            to { opacity: 1; transform: translateX(0) rotate(2deg); filter: blur(0) brightness(1); }
+        }
+
+        .celebration-photo:hover {
+            transform: scale(1.03) rotate(0deg) !important;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 50px rgba(255, 100, 140, 0.12);
+        }
+
+        .love-message {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            color: rgba(255, 185, 210, 0.75);
+            font-weight: 300;
+            font-style: italic;
+            max-width: 480px;
+            line-height: 2.2;
+            opacity: 0;
+            animation: gentleFadeIn 1.2s 1.5s ease forwards;
+            letter-spacing: 0.5px;
+        }
+
+        .love-message strong {
+            color: rgba(255, 150, 180, 1);
+            font-weight: 400;
+            font-style: normal;
+            letter-spacing: 2px;
+        }
+
+        /* ========== ELEGANT CONFETTI (thin strips) ========== */
+        .confetti-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* ========== SOFT GLOW BURST ========== */
+        .glow-burst {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 98;
+            animation: glowBurst 2s ease-out forwards;
+        }
+
+        @keyframes glowBurst {
+            0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.2); background: radial-gradient(circle, rgba(255,100,140,0.4), transparent 70%); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(3); background: radial-gradient(circle, rgba(255,100,140,0), transparent 70%); }
+        }
+
+        /* ========== WARM FLASH ========== */
+        .flash-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 180, 200, 0.3), rgba(255, 100, 140, 0.1), transparent);
+            z-index: 200;
+            pointer-events: none;
+            animation: warmFlash 0.8s ease-out forwards;
+        }
+
+        @keyframes warmFlash {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* ========== PAGE TRANSITION ========== */
+        .page-exit {
+            animation: pageExit 0.8s ease forwards;
+        }
+
+        @keyframes pageExit {
+            to { opacity: 0; transform: translateY(-20px); filter: blur(6px); }
+        }
+
+        /* ========== SPARKLE (subtle) ========== */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 50;
+            border-radius: 50%;
+            animation: sparkleGlow 0.8s ease-out forwards;
+        }
+
+        @keyframes sparkleGlow {
+            0% { opacity: 0; transform: scale(0); }
+            30% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
+
+        /* ========== ROSE PETALS ========== */
+        .petal {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            animation: petalDrift linear forwards;
+        }
+
+        @keyframes petalDrift {
+            0% { opacity: 0; transform: translateY(0) rotate(0deg) translateX(0); }
+            10% { opacity: 0.6; }
+            100% { opacity: 0; transform: translateY(110vh) rotate(540deg) translateX(var(--drift)); }
+        }
+
+        /* Subtle divider line */
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: rgba(255, 140, 170, 0.4);
+            margin: 15px auto 20px;
+            opacity: 0;
+            animation: gentleFadeIn 1s 1s ease forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-gradient"></div>
+    <div class="hearts-bg" id="heartsBg"></div>
+
+    <!-- ========== LANDING ========== -->
+    <section id="landing">
+        <div class="landing-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <h1 class="landing-title">Hi Pikachu</h1>
+        <div class="divider"></div>
+        <p class="landing-subtitle">
+            I have something to tell you
+        </p>
+        <button class="open-btn" onclick="openEnvelope()">here you go</button>
+    </section>
+
+    <!-- ========== QUESTION ========== -->
+    <section id="question">
+        <img src="images/question-page.jpg" alt="Us" class="question-photo">
+        <h2 class="question-text">Will you be my Valentine?</h2>
+        <div class="buttons-container" id="buttonsContainer">
+            <button class="btn-yes" onclick="sayYes()">Yes Forever &#129395;</button>
+            <button class="btn-no" id="noBtn">No &#128532;</button>
+        </div>
+    </section>
+
+    <!-- ========== CELEBRATION ========== -->
+    <section id="celebration">
+        <h1 class="celebration-title">I knew it</h1>
+        <p class="celebration-subtitle">Happy Valentine's Day, Pikachu</p>
+        <div class="celebration-photos">
+            <img src="images/question.jpg" alt="Us" class="celebration-photo" id="celPhoto1">
+            <img src="images/celebration2.jpg" alt="Us" class="celebration-photo" id="celPhoto2">
+        </div>
+        <p class="love-message">
+            Every moment with you feels like a dream I never want to wake up from.<br>
+            You're the best thing that's ever happened to me.<br><br>
+            <strong>Forever yours &#10084;&#65039;</strong>
+        </p>
+    </section>
+
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <script>
+        // ========== SOFT FLOATING LIGHT ORBS ==========
+        const heartsBg = document.getElementById('heartsBg');
+
+        function createOrb() {
+            const orb = document.createElement('div');
+            orb.className = 'floating-heart';
+            // Tiny glowing circles instead of emojis
+            const size = 3 + Math.random() * 5;
+            orb.style.width = size + 'px';
+            orb.style.height = size + 'px';
+            orb.style.borderRadius = '50%';
+            const hue = 340 + Math.random() * 30; // pinks and reds
+            const alpha = 0.5 + Math.random() * 0.4;
+            orb.style.background = `hsla(${hue}, 85%, 75%, ${alpha})`;
+            orb.style.boxShadow = `0 0 ${size * 3}px hsla(${hue}, 85%, 65%, ${alpha * 0.7})`;
+            orb.style.left = Math.random() * 100 + '%';
+            orb.style.animationDuration = (12 + Math.random() * 10) + 's';
+            orb.style.animationDelay = Math.random() * 4 + 's';
+            heartsBg.appendChild(orb);
+            setTimeout(() => orb.remove(), 25000);
+        }
+
+        setInterval(createOrb, 600);
+        for (let i = 0; i < 8; i++) setTimeout(createOrb, i * 200);
+
+        // ========== ROSE PETALS ==========
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            const size = 6 + Math.random() * 8;
+            petal.style.width = size + 'px';
+            petal.style.height = size * 0.7 + 'px';
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.top = '-15px';
+            petal.style.borderRadius = '50% 0 50% 50%';
+            const hue = 340 + Math.random() * 20;
+            petal.style.background = `hsla(${hue}, 70%, 65%, ${0.35 + Math.random() * 0.25})`;
+            petal.style.setProperty('--drift', (Math.random() - 0.5) * 150 + 'px');
+            petal.style.animationDuration = (7 + Math.random() * 6) + 's';
+            document.body.appendChild(petal);
+            setTimeout(() => petal.remove(), 15000);
+        }
+
+        setInterval(createPetal, 1200);
+
+        // ========== SUBTLE CURSOR GLOW ==========
+        let sparkleThrottle = 0;
+        document.addEventListener('mousemove', (e) => {
+            if (Date.now() - sparkleThrottle < 120) return;
+            sparkleThrottle = Date.now();
+            const s = document.createElement('div');
+            s.className = 'sparkle';
+            const size = 3 + Math.random() * 4;
+            s.style.width = size + 'px';
+            s.style.height = size + 'px';
+            s.style.left = (e.clientX + (Math.random() - 0.5) * 15) + 'px';
+            s.style.top = (e.clientY + (Math.random() - 0.5) * 15) + 'px';
+            s.style.background = `rgba(255, ${140 + Math.random() * 60}, ${170 + Math.random() * 40}, ${0.4 + Math.random() * 0.3})`;
+            s.style.boxShadow = `0 0 ${size * 2}px rgba(255, 140, 170, 0.3)`;
+            document.body.appendChild(s);
+            setTimeout(() => s.remove(), 800);
+        });
+
+        // ========== PAGE TRANSITIONS ==========
+        function openEnvelope() {
+            const landing = document.getElementById('landing');
+            landing.classList.add('page-exit');
+            setTimeout(() => {
+                landing.style.display = 'none';
+                document.getElementById('question').classList.add('visible');
+            }, 800);
+        }
+
+        // ========== NO BUTTON ==========
+        const noBtn = document.getElementById('noBtn');
+        let runCount = 0;
+        const funnyTexts = [
+            'No \uD83D\uDE14',
+            'Haha nice try! \uD83D\uDE1C',
+            'Think again! \uD83E\uDD14',
+            'Seriously?! \uD83E\uDD7A',
+            'Wrong button! \uD83D\uDE05',
+            'Not happening! \uD83C\uDFC3',
+            'Lol nope! \uD83D\uDE02',
+            'Can\'t catch me! \uD83D\uDCA8',
+            'Just say yes! \uD83D\uDE18',
+            'You know you want to! \uD83D\uDE0F',
+        ];
+
+        function runAway(e) {
+            if (e) e.preventDefault();
+            runCount++;
+
+            const vw = document.documentElement.clientWidth;
+            const vh = document.documentElement.clientHeight;
+            const pad = 60;
+
+            const newX = pad + Math.random() * (vw - 200 - pad * 2);
+            const newY = pad + Math.random() * (vh - 70 - pad * 2);
+
+            if (noBtn.parentElement !== document.body) {
+                document.body.appendChild(noBtn);
+            }
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = newX + 'px';
+            noBtn.style.top = newY + 'px';
+            noBtn.style.margin = '0';
+            noBtn.style.opacity = '1';
+            noBtn.style.transform = 'scale(1)';
+            noBtn.style.display = 'block';
+
+            noBtn.textContent = funnyTexts[runCount % funnyTexts.length];
+
+            const yesBtn = document.querySelector('.btn-yes');
+            if (runCount > 2) {
+                const yesScale = Math.min(1.4, 1 + runCount * 0.04);
+                yesBtn.style.transform = `scale(${yesScale})`;
+                yesBtn.style.boxShadow = `0 12px ${30 + runCount * 4}px rgba(255, 60, 100, ${Math.min(0.6, 0.3 + runCount * 0.025)})`;
+            }
+        }
+
+        noBtn.addEventListener('mouseover', runAway);
+        noBtn.addEventListener('touchstart', runAway);
+        noBtn.addEventListener('click', runAway);
+
+        // ========== YES ==========
+        function sayYes() {
+            // Warm glow flash
+            const flash = document.createElement('div');
+            flash.className = 'flash-overlay';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 800);
+
+            // Soft center glow burst
+            const glow = document.createElement('div');
+            glow.className = 'glow-burst';
+            document.body.appendChild(glow);
+            setTimeout(() => glow.remove(), 2000);
+
+            // Elegant confetti
+            createElegantConfetti();
+
+            const q = document.getElementById('question');
+            noBtn.style.display = 'none';
+            q.classList.add('page-exit');
+
+            setTimeout(() => {
+                q.style.display = 'none';
+                const c = document.getElementById('celebration');
+                c.classList.add('visible');
+
+                setTimeout(() => {
+                    document.getElementById('celPhoto1').classList.add('animate-in');
+                    document.getElementById('celPhoto2').classList.add('animate-in');
+                }, 200);
+
+                // One more gentle wave
+                setTimeout(createElegantConfetti, 1500);
+            }, 800);
+        }
+
+        // ========== ELEGANT CONFETTI ==========
+        function createElegantConfetti() {
+            const container = document.getElementById('confettiContainer');
+            const palette = [
+                'rgba(255, 180, 200, 0.85)',
+                'rgba(255, 140, 170, 0.8)',
+                'rgba(255, 200, 215, 0.7)',
+                'rgba(255, 110, 150, 0.7)',
+                'rgba(255, 220, 230, 0.6)',
+                'rgba(255, 160, 185, 0.8)',
+                'rgba(255, 255, 255, 0.5)',
+            ];
+
+            for (let i = 0; i < 40; i++) {
+                const piece = document.createElement('div');
+                const color = palette[Math.floor(Math.random() * palette.length)];
+                const startX = Math.random() * window.innerWidth;
+
+                // Thin elegant strips
+                const w = 2 + Math.random() * 3;
+                const h = 10 + Math.random() * 20;
+
+                piece.style.position = 'absolute';
+                piece.style.left = startX + 'px';
+                piece.style.top = '-30px';
+                piece.style.width = w + 'px';
+                piece.style.height = h + 'px';
+                piece.style.background = color;
+                piece.style.borderRadius = '1px';
+
+                container.appendChild(piece);
+
+                const duration = 3000 + Math.random() * 3000;
+                const drift = (Math.random() - 0.5) * 300;
+                const rotation = Math.random() * 720 - 360;
+
+                piece.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 0.8 },
+                    { transform: `translateY(${window.innerHeight + 40}px) translateX(${drift}px) rotate(${rotation}deg)`, opacity: 0 }
+                ], {
+                    duration,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                    fill: 'forwards'
+                });
+
+                setTimeout(() => piece.remove(), duration);
+            }
+        }
+    </script>
+</body>
+</html>
